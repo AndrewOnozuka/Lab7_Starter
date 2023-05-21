@@ -68,10 +68,15 @@ async function getRecipes() {
   // EXPOSE - START (All expose numbers start with A)
   // A1. TODO - Check local storage to see if there are any recipes.
   //            If there are recipes, return them.
+  let recipes = localStorage.getItem("recipes");
+  if (recipes != null) {
+    return JSON.parse(recipes);
+  }
   /**************************/
   // The rest of this method will be concerned with requesting the recipes
   // from the network
   // A2. TODO - Create an empty array to hold the recipes that you will fetch
+  let newRecipes = [];
   // A3. TODO - Return a new Promise. If you are unfamiliar with promises, MDN
   //            has a great article on them. A promise takes one parameter - A
   //            function (we call these callback functions). That function will
@@ -85,14 +90,14 @@ async function getRecipes() {
   //            declared above
   // A5. TODO - Since we are going to be dealing with asynchronous code, create
   //            a try / catch block. A6-A9 will be in the try portion, A10-A11
-  //            will be in the catch portion.
+  //            will be in the catch portion.  
   // A6. TODO - For each URL in that array, fetch the URL - MDN also has a great
   //            article on fetch(). NOTE: Fetches are ASYNCHRONOUS, meaning that
   //            you must either use "await fetch(...)" or "fetch.then(...)". This
-  //            function is using the async keyword so we recommend "await"
+  //            function is using the async keyword so we recommend "await"    
   // A7. TODO - For each fetch response, retrieve the JSON from it using .json().
   //            NOTE: .json() is ALSO asynchronous, so you will need to use
-  //            "await" again
+  //            "await" again   
   // A8. TODO - Add the new recipe to the recipes array
   // A9. TODO - Check to see if you have finished retrieving all of the recipes,
   //            if you have, then save the recipes to storage using the function
@@ -100,6 +105,21 @@ async function getRecipes() {
   //            resolve() method.
   // A10. TODO - Log any errors from catch using console.error
   // A11. TODO - Pass any errors to the Promise's reject() function
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < RECIPE_URLS.length; i++) {
+      try {
+        let fetched = await fetch(RECIPE_URLS[i]);
+        newRecipes.push(await fetched.json());
+        if (i == RECIPE_URLS.length - 1) {
+          saveRecipesToStorage(newRecipes);
+          resolve(newRecipes);
+        }
+      } catch (error) {
+        console.error(error);
+        reject(error);
+      }
+    }
+  })
 }
 
 /**
